@@ -1,9 +1,8 @@
-import { catalog } from "./catalog.js";
-
+import { getCatalog } from "./catalog.js";
 const INR = n => Math.round(Number(n) || 0);
 
-function demoPlan(prompt, budget) {
-  const text = prompt.toLowerCase();
+function demoPlan(prompt, budget, catalog) {
+    const text = prompt.toLowerCase();
   const headcount = Number(text.match(/(\d+)\s*(students|people|attendees|guests)/)?.[1] || 100);
   const wants = [
     { keys:["food","meal","cater"], category:"Food", qty:headcount, fallback:headcount },
@@ -53,11 +52,12 @@ function demoPlan(prompt, budget) {
 
 
 export async function createPlan(prompt, budget) {
+  const catalog = getCatalog();
   const key = process.env.GROQ_API_KEY;
   console.log("Groq key loaded:", Boolean(key));
 console.log("Groq model:", process.env.GROQ_MODEL);
 
-  if (!key) return demoPlan(prompt, budget);
+  if (!key) return demoPlan(prompt, budget, catalog);
 
   const model = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
@@ -172,7 +172,7 @@ Required JSON structure:
 
   } catch (err) {
   console.error("GROQ ERROR:", err);
-  const fallback = demoPlan(prompt, budget);
+  const fallback = demoPlan(prompt, budget, catalog);
     fallback.note = `Groq unavailable (${err.message}); demo planner used instead.`;
     return fallback;
   }

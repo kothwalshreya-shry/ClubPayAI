@@ -20,3 +20,51 @@ export async function capturePaypalOrder(orderId) {
   const response=await fetch(`${base()}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"}});
   const data=await response.json(); if(!response.ok) throw new Error(data.message || "PayPal capture failed"); return data;
 }
+
+export async function getPaypalCapture(captureId) {
+  const token = await accessToken();
+
+  const response = await fetch(
+    `${base()}/v2/payments/captures/${encodeURIComponent(captureId)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Could not retrieve PayPal capture.");
+  }
+
+  return data;
+}
+
+export async function getPaypalOrder(orderId) {
+  const token = await accessToken();
+
+  const response = await fetch(
+    `${base()}/v2/checkout/orders/${encodeURIComponent(orderId)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Could not retrieve PayPal order.");
+  }
+
+  return data;
+}
+
+
