@@ -28,7 +28,20 @@ import {
 
 const app=express();
 app.use(helmet({crossOriginResourcePolicy:{policy:"cross-origin"}}));
-app.use(cors({origin:process.env.CLIENT_ORIGIN?.split(",") || "http://localhost:5173"}));
+const allowedOrigins = [
+  "https://club-pay-ai.vercel.app",
+  "http://localhost:5173"
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+}));
 app.use(express.json({limit:"1mb"}));
 const port=Number(process.env.PORT||4000);
 const INR_PER_USD=85; // Demo conversion assumption; disclose in UI and README.
